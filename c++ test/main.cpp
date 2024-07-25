@@ -9,9 +9,9 @@ struct User {
     User* next;
 };
 
-User* users = nullptr; // Linked list head
+User* users = nullptr;
 
-void registerUser(string username, string password, bool isAdmin) {
+void registerUser(const string& username, const string& password, bool isAdmin) {
     User* newUser = new User();
     newUser->username = username;
     newUser->password = password;
@@ -20,7 +20,7 @@ void registerUser(string username, string password, bool isAdmin) {
     users = newUser;
 }
 
-bool loginUser(string username, string password, bool &isAdmin) {
+bool loginUser(const string& username, const string& password, bool &isAdmin) {
     User* current = users;
     while (current != nullptr) {
         if (current->username == username && current->password == password) {
@@ -33,6 +33,7 @@ bool loginUser(string username, string password, bool &isAdmin) {
 }
 
 const int MAX_ITEMS = 100;
+const int MAX_CART_ITEMS = 100;
 
 struct Item {
     string name;
@@ -43,7 +44,15 @@ struct Item {
 Item inventory[MAX_ITEMS];
 int itemCount = 0;
 
-void addItem(string name, double price, int quantity) {
+struct CartItem {
+    Item item;
+    int quantity;
+};
+
+CartItem cart[MAX_CART_ITEMS];
+int cartItemCount = 0;
+
+void addItem(const string& name, double price, int quantity) {
     if (itemCount < MAX_ITEMS) {
         inventory[itemCount].name = name;
         inventory[itemCount].price = price;
@@ -64,7 +73,7 @@ void viewItems() {
     }
 }
 
-void editItem(int index, string name, double price, int quantity) {
+void editItem(int index, const string& name, double price, int quantity) {
     if (index >= 0 && index < itemCount) {
         inventory[index].name = name;
         inventory[index].price = price;
@@ -85,6 +94,58 @@ void deleteItem(int index) {
     }
 }
 
+void addToCart(int index, int quantity) {
+    if (index >= 0 && index < itemCount && quantity > 0 && inventory[index].quantity >= quantity) {
+        inventory[index].quantity -= quantity;
+        bool found = false;
+        for (int i = 0; i < cartItemCount; ++i) {
+            if (cart[i].item.name == inventory[index].name) {
+                cart[i].quantity += quantity;
+                found = true;
+                break;
+            }
+        }
+        if (!found && cartItemCount < MAX_CART_ITEMS) {
+            cart[cartItemCount++] = {inventory[index], quantity};
+        }
+        cout << "Added " << quantity << " of " << inventory[index].name << " to the cart." << endl;
+    } else {
+        cout << "Invalid item index or insufficient quantity." << endl;
+    }
+}
+
+void viewCart() {
+    if (cartItemCount == 0) {
+        cout << "Cart is empty." << endl;
+    } else {
+        cout << "Items in the cart:" << endl;
+        for (int i = 0; i < cartItemCount; ++i) {
+            cout << i + 1 << ". " << cart[i].item.name << " - $" << cart[i].item.price << " - Quantity: " << cart[i].quantity << endl;
+        }
+    }
+}
+
+void checkout() {
+    if (cartItemCount == 0) {
+        cout << "Cart is empty. Nothing to checkout." << endl;
+    } else {
+        double total = 0;
+        for (int i = 0; i < cartItemCount; ++i) {
+            total += cart[i].item.price * cart[i].quantity;
+        }
+        cout << "Total amount to pay: $" << total << endl;
+        cout << "Confirm checkout? (y/n): ";
+        char confirmation;
+        cin >> confirmation;
+        if (confirmation == 'y' || confirmation == 'Y') {
+            cartItemCount = 0; // Clear cart after checkout
+            cout << "Checked out successfully. Thank you for your purchase!" << endl;
+        } else {
+            cout << "Checkout canceled." << endl;
+        }
+    }
+}
+
 void adminMenu() {
     int choice;
     do {
@@ -94,8 +155,10 @@ void adminMenu() {
             string name;
             double price;
             int quantity;
-            cout << "Enter item name: ";
-            cin >> name;
+            cout << "Enter item name (or 0 to cancel): ";
+            cin.ignore();
+            getline(cin, name);
+            if (name == "0") continue;
             cout << "Enter item price: ";
             cin >> price;
             cout << "Enter item quantity: ";
@@ -110,8 +173,10 @@ void adminMenu() {
             int quantity;
             cout << "Enter item index to edit: ";
             cin >> index;
-            cout << "Enter new item name: ";
-            cin >> name;
+            cout << "Enter new item name (or 0 to cancel): ";
+            cin.ignore();
+            getline(cin, name);
+            if (name == "0") continue;
             cout << "Enter new item price: ";
             cin >> price;
             cout << "Enter new item quantity: ";
@@ -129,7 +194,7 @@ void adminMenu() {
 void userMenu() {
     int choice;
     do {
-        cout << "1. View Items\n2. Buy Item\n3. Logout\nEnter choice: ";
+        cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Checkout\n5. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
             viewItems();
@@ -142,19 +207,17 @@ void userMenu() {
                 cin >> index;
                 cout << "Enter quantity to buy: ";
                 cin >> quantity;
-                if (index > 0 && index <= itemCount && inventory[index - 1].quantity >= quantity) {
-                    inventory[index - 1].quantity -= quantity;
-                    cout << "Purchased " << quantity << " of " << inventory[index - 1].name << endl;
-                } else {
-                    cout << "Invalid item index or insufficient quantity." << endl;
-                }
+                addToCart(index - 1, quantity);
             }
+        } else if (choice == 3) {
+            viewCart();
+        } else if (choice == 4) {
+            checkout();
         }
-    } while (choice != 3);
+    } while (choice != 5);
 }
 
 int main() {
-    // Register a default admin
     registerUser("admin", "admin123", true);
 
     int startChoice;
@@ -180,8 +243,9 @@ int main() {
             }
         } else if (startChoice == 2) {
             string username, password;
-            cout << "Enter new username: ";
+            cout << "Enter new username (or 0 to cancel): ";
             cin >> username;
+            if (username == "0") continue;
             cout << "Enter new password: ";
             cin >> password;
 
@@ -189,6 +253,13 @@ int main() {
             cout << "User registered successfully." << endl;
         }
     } while (startChoice != 3);
+
+
+    while (users != nullptr) {
+        User* temp = users;
+        users = users->next;
+        delete temp;
+    }
 
     return 0;
 }
