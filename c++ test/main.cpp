@@ -1,5 +1,9 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <string>
+#include <cstdlib>
+
 using namespace std;
 
 struct User {
@@ -10,6 +14,11 @@ struct User {
 };
 
 User* users = nullptr;
+
+void clearScreen(){
+    std::this_thread::sleep_for(chrono::seconds(2));
+    cout << "\033[2J\033[1;1H";
+}
 
 void registerUser(const string& username, const string& password, bool isAdmin) {
     User* newUser = new User();
@@ -60,6 +69,7 @@ void addItem(const string& name, double price, int quantity) {
         itemCount++;
     } else {
         cout << "Inventory full, cannot add more items." << endl;
+        clearScreen();
     }
 }
 
@@ -80,6 +90,7 @@ void editItem(int index, const string& name, double price, int quantity) {
         inventory[index].quantity = quantity;
     } else {
         cout << "Invalid item index." << endl;
+        clearScreen();
     }
 }
 
@@ -91,6 +102,7 @@ void deleteItem(int index) {
         itemCount--;
     } else {
         cout << "Invalid item index." << endl;
+        clearScreen();
     }
 }
 
@@ -111,6 +123,7 @@ void addToCart(int index, int quantity) {
         cout << "Added " << quantity << " of " << inventory[index].name << " to the cart." << endl;
     } else {
         cout << "Invalid item index or insufficient quantity." << endl;
+        clearScreen();
     }
 }
 
@@ -128,6 +141,7 @@ void viewCart() {
 void checkout() {
     if (cartItemCount == 0) {
         cout << "Cart is empty. Nothing to checkout." << endl;
+        clearScreen();
     } else {
         double total = 0;
         for (int i = 0; i < cartItemCount; ++i) {
@@ -140,8 +154,10 @@ void checkout() {
         if (confirmation == 'y' || confirmation == 'Y') {
             cartItemCount = 0; // Clear cart after checkout
             cout << "Checked out successfully. Thank you for your purchase!" << endl;
+            clearScreen();
         } else {
             cout << "Checkout canceled." << endl;
+            clearScreen();
         }
     }
 }
@@ -201,12 +217,15 @@ void userMenu() {
         } else if (choice == 2) {
             if (itemCount == 0) {
                 cout << "No items available to buy." << endl;
+                clearScreen();
             } else {
                 int index, quantity;
                 cout << "Enter item index to buy: ";
                 cin >> index;
+                clearScreen();
                 cout << "Enter quantity to buy: ";
                 cin >> quantity;
+                clearScreen();
                 addToCart(index - 1, quantity);
             }
         } else if (choice == 3) {
@@ -240,9 +259,11 @@ int main() {
                 }
             } else {
                 cout << "Invalid login credentials." << endl;
+                clearScreen();
             }
         } else if (startChoice == 2) {
             string username, password;
+            clearScreen();
             cout << "Enter new username (or 0 to cancel): ";
             cin >> username;
             if (username == "0") continue;
@@ -251,6 +272,7 @@ int main() {
 
             registerUser(username, password, false);
             cout << "User registered successfully." << endl;
+            clearScreen();
         }
     } while (startChoice != 3);
 
