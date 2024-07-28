@@ -171,6 +171,7 @@ void addToCart(int index, int quantity) {
 void viewCart() {
     if (cartHead == nullptr) {
         cout << "Cart is empty." << endl;
+        clearScreen();
     } else {
         cout << "=======================================\n";
         cout << "   𝑰 𝑻 𝑬 𝑴 𝑺  𝑰 𝑵  𝑻 𝑯 𝑬  𝑪 𝑨 𝑹 𝑻  \n";
@@ -257,13 +258,17 @@ void adminMenu() {
         cout << "1. Add Item\n2. View Items\n3. Edit Item\n4. Delete Item\n5. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
+            clearScreen();
             string name;
             double price;
             int quantity;
             cout << "Enter item name (or 0 to cancel): ";
             cin.ignore();
             getline(cin, name);
-            if (name == "0") continue;
+            if (name == "0")  {
+                clearScreen();
+                continue;
+            }
             cout << "Enter item price: ";
             cin >> price;
             cout << "Enter item quantity: ";
@@ -279,11 +284,11 @@ void adminMenu() {
             cin.get();
             clearScreen();
         } else if (choice == 3) {
+            clearScreen();
             int index;
             string name;
             double price;
             int quantity;
-            clearScreen();
             viewItems();
             cout << endl;
             cout << "Enter item index to edit: ";
@@ -291,7 +296,10 @@ void adminMenu() {
             cout << "Enter new item name (or 0 to cancel): ";
             cin.ignore();
             getline(cin, name);
-            if (name == "0") continue;
+            if (name == "0") {
+                clearScreen();
+                continue;
+            }
             cout << "Enter new item price: ";
             cin >> price;
             cout << "Enter new item quantity: ";
@@ -300,11 +308,16 @@ void adminMenu() {
             cout << "Item successfully changed.";
             clearScreen();
         } else if (choice == 4) {
+            clearScreen();
             int index;
             viewItems();
             cout << endl;
-            cout << "Enter item index to delete: ";
+            cout << "Enter item index to delete (or 0 to cancel): ";
             cin >> index;
+            if (index == 0) {
+                clearScreen();
+                continue;
+            }
             deleteItem(index - 1);
             cout << "Item deleted.";
             clearScreen();
@@ -347,10 +360,6 @@ void userMenu() {
         } else if (choice == 3) {
             clearScreen();
             viewCart();
-            cout << "\nPress ENTER to return to the user menu.";
-            cin.ignore();
-            cin.get();
-            clearScreen();
         } else if (choice == 4) {
             clearScreen();
             viewCart();
