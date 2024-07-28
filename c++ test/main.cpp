@@ -41,54 +41,58 @@ bool loginUser(const string& username, const string& password, bool &isAdmin) {
     return false;
 }
 
-const int MAX_ITEMS = 100;
-const int MAX_CART_ITEMS = 100;
-
 struct Item {
     string name;
     double price;
     int quantity;
+    Item* next;
 };
 
-Item inventory[MAX_ITEMS];
-int itemCount = 0;
+Item* inventoryHead = nullptr;
 
-struct CartItem {
+struct CartItemNode {
     Item item;
     int quantity;
+    CartItemNode* next;
 };
 
-CartItem cart[MAX_CART_ITEMS];
-int cartItemCount = 0;
+CartItemNode* cartHead = nullptr;
 
 void addItem(const string& name, double price, int quantity) {
-    if (itemCount < MAX_ITEMS) {
-        inventory[itemCount].name = name;
-        inventory[itemCount].price = price;
-        inventory[itemCount].quantity = quantity;
-        itemCount++;
-    } else {
-        cout << "Inventory full, cannot add more items." << endl;
-        clearScreen();
-    }
+    Item* newItem = new Item();
+    newItem->name = name;
+    newItem->price = price;
+    newItem->quantity = quantity;
+    newItem->next = inventoryHead;
+    inventoryHead = newItem;
 }
 
 void viewItems() {
-    if (itemCount == 0) {
+    if (inventoryHead == nullptr) {
         cout << "No items in the inventory." << endl;
         clearScreen();
     } else {
-        for (int i = 0; i < itemCount; i++) {
-            cout << i + 1 << ". " << inventory[i].name << " - $" << inventory[i].price << " - Quantity: " << inventory[i].quantity << endl;
+        Item* current = inventoryHead;
+        int index = 1;
+        while (current != nullptr) {
+            cout << index << ". " << current->name << " - $" << current->price << " - Quantity: " << current->quantity << endl;
+            current = current->next;
+            index++;
         }
     }
 }
 
 void editItem(int index, const string& name, double price, int quantity) {
-    if (index >= 0 && index < itemCount) {
-        inventory[index].name = name;
-        inventory[index].price = price;
-        inventory[index].quantity = quantity;
+    Item* current = inventoryHead;
+    int currentIndex = 0;
+    while (current != nullptr && currentIndex < index) {
+        current = current->next;
+        currentIndex++;
+    }
+    if (current != nullptr) {
+        current->name = name;
+        current->price = price;
+        current->quantity = quantity;
     } else {
         cout << "Invalid item index." << endl;
         clearScreen();
@@ -96,32 +100,48 @@ void editItem(int index, const string& name, double price, int quantity) {
 }
 
 void deleteItem(int index) {
-    if (index >= 0 && index < itemCount) {
-        for (int i = index; i < itemCount - 1; i++) {
-            inventory[i] = inventory[i + 1];
-        }
-        itemCount--;
-    } else {
-        cout << "Invalid item index." << endl;
+    if (inventoryHead == nullptr) {
+        cout << "No items to delete." << endl;
         clearScreen();
+        return;
+    }
+    if (index == 0) {
+        Item* temp = inventoryHead;
+        inventoryHead = inventoryHead->next;
+        delete temp;
+    } else {
+        Item* current = inventoryHead;
+        int currentIndex = 0;
+        while (current->next != nullptr && currentIndex < index - 1) {
+            current = current->next;
+            currentIndex++;
+        }
+        if (current->next != nullptr) {
+            Item* temp = current->next;
+            current->next = current->next->next;
+            delete temp;
+        } else {
+            cout << "Invalid item index." << endl;
+            clearScreen();
+        }
     }
 }
 
 void addToCart(int index, int quantity) {
-    if (index >= 0 && index < itemCount && quantity > 0 && inventory[index].quantity >= quantity) {
-        inventory[index].quantity -= quantity;
-        bool found = false;
-        for (int i = 0; i < cartItemCount; ++i) {
-            if (cart[i].item.name == inventory[index].name) {
-                cart[i].quantity += quantity;
-                found = true;
-                break;
-            }
-        }
-        if (!found && cartItemCount < MAX_CART_ITEMS) {
-            cart[cartItemCount++] = {inventory[index], quantity};
-        }
-        cout << "Added " << quantity << " of " << inventory[index].name << " to the cart." << endl;
+    Item* current = inventoryHead;
+    int currentIndex = 0;
+    while (current != nullptr && currentIndex < index) {
+        current = current->next;
+        currentIndex++;
+    }
+    if (current != nullptr && quantity > 0 && current->quantity >= quantity) {
+        current->quantity -= quantity;
+        CartItemNode* newCartItem = new CartItemNode();
+        newCartItem->item = *current;
+        newCartItem->quantity = quantity;
+        newCartItem->next = cartHead;
+        cartHead = newCartItem;
+        cout << "Added " << quantity << " of " << current->name << " to the cart." << endl;
     } else {
         cout << "Invalid item index or insufficient quantity." << endl;
         clearScreen();
@@ -129,32 +149,71 @@ void addToCart(int index, int quantity) {
 }
 
 void viewCart() {
-    if (cartItemCount == 0) {
+    if (cartHead == nullptr) {
         cout << "Cart is empty." << endl;
         clearScreen();
     } else {
-        cout << "Items in the cart:" << endl;
-        for (int i = 0; i < cartItemCount; ++i) {
-            cout << i + 1 << ". " << cart[i].item.name << " - $" << cart[i].item.price << " - Quantity: " << cart[i].quantity << endl;
+        CartItemNode* current = cartHead;
+        int index = 1;
+        while (current != nullptr) {
+            cout << index << ". " << current->item.name << " - $" << current->item.price << " - Quantity: " << current->quantity << endl;
+            current = current->next;
+            index++;
+        }
+    }
+}
+
+void removeFromCart(int index) {
+    if (cartHead == nullptr) {
+        cout << "Cart is empty. Nothing to remove." << endl;
+        clearScreen();
+        return;
+    }
+
+    if (index == 0) {
+        CartItemNode* temp = cartHead;
+        cartHead = cartHead->next;
+        delete temp;
+    } else {
+        CartItemNode* current = cartHead;
+        int currentIndex = 0;
+        while (current->next != nullptr && currentIndex < index - 1) {
+            current = current->next;
+            currentIndex++;
+        }
+
+        if (current->next != nullptr) {
+            CartItemNode* temp = current->next;
+            current->next = current->next->next;
+            delete temp;
+        } else {
+            cout << "Invalid cart item index." << endl;
+            clearScreen();
         }
     }
 }
 
 void checkout() {
-    if (cartItemCount == 0) {
+    if (cartHead == nullptr) {
         cout << "Cart is empty. Nothing to checkout." << endl;
         clearScreen();
     } else {
         double total = 0;
-        for (int i = 0; i < cartItemCount; ++i) {
-            total += cart[i].item.price * cart[i].quantity;
+        CartItemNode* current = cartHead;
+        while (current != nullptr) {
+            total += current->item.price * current->quantity;
+            current = current->next;
         }
         cout << "Total amount to pay: $" << total << endl;
         cout << "Confirm checkout? (y/n): ";
         char confirmation;
         cin >> confirmation;
         if (confirmation == 'y' || confirmation == 'Y') {
-            cartItemCount = 0;
+            while (cartHead != nullptr) {
+                CartItemNode* temp = cartHead;
+                cartHead = cartHead->next;
+                delete temp;
+            }
             cout << "Checked out successfully. Thank you for your purchase!" << endl;
             clearScreen();
         } else {
@@ -228,7 +287,7 @@ void adminMenu() {
 void userMenu() {
     int choice;
     do {
-        cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Checkout\n5. Logout\nEnter choice: ";
+        cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Remove from Cart\n5. Checkout\n6. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
             clearScreen();
@@ -238,7 +297,7 @@ void userMenu() {
             cin.get();
             clearScreen();
         } else if (choice == 2) {
-            if (itemCount == 0) {
+            if (inventoryHead == nullptr) {
                 cout << "No items available to buy." << endl;
                 clearScreen();
             } else {
@@ -257,9 +316,17 @@ void userMenu() {
             viewCart();
         } else if (choice == 4) {
             clearScreen();
+            viewCart();
+            int index;
+            cout << "Enter item index to remove from cart: ";
+            cin >> index;
+            removeFromCart(index - 1);
+            clearScreen();
+        } else if (choice == 5) {
+            clearScreen();
             checkout();
         }
-    } while (choice != 5);
+    } while (choice != 6);
     cout << "Logging out . . .";
     clearScreen();
 }
@@ -322,6 +389,18 @@ int main() {
     while (users != nullptr) {
         User* temp = users;
         users = users->next;
+        delete temp;
+    }
+
+    while (inventoryHead != nullptr) {
+        Item* temp = inventoryHead;
+        inventoryHead = inventoryHead->next;
+        delete temp;
+    }
+
+    while (cartHead != nullptr) {
+        CartItemNode* temp = cartHead;
+        cartHead = cartHead->next;
         delete temp;
     }
 
