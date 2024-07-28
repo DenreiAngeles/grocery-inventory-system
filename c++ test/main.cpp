@@ -271,10 +271,11 @@ void adminMenu() {
         cin >> choice;
         if (choice == 1) {
             clearScreen();
+            viewItems();
             string name;
             double price;
             int quantity;
-            cout << "Enter item name (or 0 to cancel): ";
+            cout << "\nEnter item name (or 0 to cancel): ";
             cin.ignore();
             getline(cin, name);
             if (name == "0")  {
@@ -372,6 +373,11 @@ void userMenu() {
         } else if (choice == 3) {
             clearScreen();
             viewCart();
+            cout << "\nPress ENTER to return to the user menu.";
+            cin.ignore();
+            cin.get();
+            clearScreen();
+
         } else if (choice == 4) {
             clearScreen();
             viewCart();
