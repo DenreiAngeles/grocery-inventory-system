@@ -154,7 +154,7 @@ void checkout() {
         char confirmation;
         cin >> confirmation;
         if (confirmation == 'y' || confirmation == 'Y') {
-            cartItemCount = 0; // Clear cart after checkout
+            cartItemCount = 0;
             cout << "Checked out successfully. Thank you for your purchase!" << endl;
             clearScreen();
         } else {
@@ -182,13 +182,21 @@ void adminMenu() {
             cout << "Enter item quantity: ";
             cin >> quantity;
             addItem(name, price, quantity);
+            cout << "Item added to inventory.";
+            clearScreen();
         } else if (choice == 2) {
             viewItems();
+            cout << "\nPress ENTER to return to the user menu.";
+            cin.ignore();
+            cin.get();
+            clearScreen();
         } else if (choice == 3) {
             int index;
             string name;
             double price;
             int quantity;
+            viewItems();
+            cout << endl;
             cout << "Enter item index to edit: ";
             cin >> index;
             cout << "Enter new item name (or 0 to cancel): ";
@@ -200,13 +208,20 @@ void adminMenu() {
             cout << "Enter new item quantity: ";
             cin >> quantity;
             editItem(index - 1, name, price, quantity);
+            cout << "Item successfully changed.";
+            clearScreen();
         } else if (choice == 4) {
             int index;
+            viewItems();
+            cout << endl;
             cout << "Enter item index to delete: ";
             cin >> index;
             deleteItem(index - 1);
+            cout << "Item deleted.";
+            clearScreen();
         }
     } while (choice != 5);
+    cout << "Logging out. . .";
     clearScreen();
 }
 
@@ -275,6 +290,7 @@ int main() {
 
             if (loginUser(username, password, isAdmin)) {
                 if (isAdmin) {
+                    cout << "Admin logged in succesfully . . .";
                     clearScreen();
                     adminMenu();
                 } else {
@@ -300,7 +316,8 @@ int main() {
             clearScreen();
         }
     } while (startChoice != 3);
-
+    cout << "Thank you for your patronage!";
+    clearScreen();
 
     while (users != nullptr) {
         User* temp = users;
