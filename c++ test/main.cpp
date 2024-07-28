@@ -76,6 +76,7 @@ void addItem(const string& name, double price, int quantity) {
 void viewItems() {
     if (itemCount == 0) {
         cout << "No items in the inventory." << endl;
+        clearScreen();
     } else {
         for (int i = 0; i < itemCount; i++) {
             cout << i + 1 << ". " << inventory[i].name << " - $" << inventory[i].price << " - Quantity: " << inventory[i].quantity << endl;
@@ -130,6 +131,7 @@ void addToCart(int index, int quantity) {
 void viewCart() {
     if (cartItemCount == 0) {
         cout << "Cart is empty." << endl;
+        clearScreen();
     } else {
         cout << "Items in the cart:" << endl;
         for (int i = 0; i < cartItemCount; ++i) {
@@ -205,6 +207,7 @@ void adminMenu() {
             deleteItem(index - 1);
         }
     } while (choice != 5);
+    clearScreen();
 }
 
 void userMenu() {
@@ -213,31 +216,50 @@ void userMenu() {
         cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Checkout\n5. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
+            clearScreen();
             viewItems();
+            cout << "\nPress ENTER to return to the user menu.";
+            cin.ignore();
+            cin.get();
+            clearScreen();
         } else if (choice == 2) {
             if (itemCount == 0) {
                 cout << "No items available to buy." << endl;
                 clearScreen();
             } else {
+                clearScreen();
+                viewItems();
                 int index, quantity;
-                cout << "Enter item index to buy: ";
+                cout << "\nEnter item index to buy: ";
                 cin >> index;
                 clearScreen();
                 cout << "Enter quantity to buy: ";
                 cin >> quantity;
-                clearScreen();
                 addToCart(index - 1, quantity);
             }
         } else if (choice == 3) {
+            clearScreen();
             viewCart();
         } else if (choice == 4) {
+            clearScreen();
             checkout();
         }
     } while (choice != 5);
+    cout << "Logging out . . .";
+    clearScreen();
+}
+
+void addDefaultItems() {
+    addItem("Apple", 1.0, 50);
+    addItem("Banana", 0.5, 100);
+    addItem("Orange", 0.8, 75);
+    addItem("Milk", 1.5, 30);
+    addItem("Bread", 2.0, 25);
 }
 
 int main() {
     registerUser("admin", "admin123", true);
+    addDefaultItems();
 
     int startChoice;
     do {
@@ -253,8 +275,11 @@ int main() {
 
             if (loginUser(username, password, isAdmin)) {
                 if (isAdmin) {
+                    clearScreen();
                     adminMenu();
                 } else {
+                    cout << "Logged in succesfully . . .";
+                    clearScreen();
                     userMenu();
                 }
             } else {
