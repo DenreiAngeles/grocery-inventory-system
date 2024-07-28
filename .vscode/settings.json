@@ -55,7 +55,9 @@
     "xstring": "cpp",
     "xtr1common": "cpp",
     "xutility": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "chrono": "cpp",
+    "text_encoding": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

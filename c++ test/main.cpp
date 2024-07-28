@@ -21,6 +21,17 @@ void clearScreen() {
     cout << "\033[2J\033[1;1H";
 }
 
+bool usernameExists(const string& username) {
+    User* current = users;
+    while (current != nullptr) {
+        if (current->username == username) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+
 void registerUser(const string& username, const string& password, bool isAdmin) {
     User* newUser = new User();
     newUser->username = username;
@@ -29,6 +40,7 @@ void registerUser(const string& username, const string& password, bool isAdmin) 
     newUser->next = users;
     users = newUser;
 }
+
 
 bool loginUser(const string& username, const string& password, bool& isAdmin) {
     User* current = users;
@@ -74,7 +86,7 @@ void viewItems() {
         clearScreen();
     } else {
         cout << "===========================================================\n";
-        cout << "                INVENTORY MENU\n";
+        cout << "                    INVENTORY MENU\n";
         cout << "===========================================================\n";
         cout << setw(5) << left << "No."
              << setw(25) << left << "Item Name"
@@ -174,7 +186,7 @@ void viewCart() {
         clearScreen();
     } else {
         cout << "=================================================\n";
-        cout << "             ITEMS IN THE CART\n";
+        cout << "                ITEMS IN THE CART\n";
         cout << "=================================================\n";
         cout << "\n";
         CartItemNode* current = cartHead;
@@ -370,6 +382,7 @@ void userMenu() {
             clearScreen();
         } else if (choice == 5) {
             clearScreen();
+            viewCart();
             checkout();
         }
     } while (choice != 6);
@@ -426,12 +439,22 @@ int main() {
             clearScreen();
             cout << "Enter new username (or 0 to cancel): ";
             cin >> username;
-            if (username == "0") continue;
+            if (username == "0") {
+                clearScreen();
+                continue;
+            }
             cout << "Enter new password: ";
             cin >> password;
-
+            if (usernameExists(username)) {
+                cout << "Username already exists. Please choose a different username." << endl;
+                clearScreen();
+                continue;
+            }
             registerUser(username, password, false);
             cout << "User registered successfully." << endl;
+            clearScreen();
+        } else {
+            cout << "Invalid Input. Please enter a valid input.";
             clearScreen();
         }
     } while (startChoice != 3);
