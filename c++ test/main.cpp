@@ -369,6 +369,7 @@ void addDefaultItems() {
 }
 
 int main() {
+    clearScreen();
     registerUser("admin", "admin123", true);
     addDefaultItems();
 
