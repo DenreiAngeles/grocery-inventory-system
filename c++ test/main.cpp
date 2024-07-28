@@ -73,15 +73,15 @@ void viewItems() {
         cout << "No items in the inventory." << endl;
         clearScreen();
     } else {
-        cout << "===============================================\n";
-        cout << "       𝑰 𝑵 𝑽 𝑬 𝑵 𝑻 𝑶 𝑹 𝒀   𝑰 𝑻 𝑬 𝑴 𝑺            \n";
-        cout << "===============================================\n";
+        cout << "===========================================================\n";
+        cout << "                INVENTORY MENU\n";
+        cout << "===========================================================\n";
         cout << setw(5) << left << "No."
              << setw(25) << left << "Item Name"
              << setw(10) << left << "Price"
              << setw(10) << left << "Quantity"
              << endl;
-        cout << "-----------------------------------------------\n";
+        cout << "-----------------------------------------------------------\n";
 
         Item* current = inventoryHead;
         int index = 1;
@@ -94,7 +94,7 @@ void viewItems() {
             current = current->next;
             index++;
         }
-        cout << "===============================================\n";
+        cout << "===========================================================\n";
     }
 }
 
@@ -173,9 +173,9 @@ void viewCart() {
         cout << "Cart is empty." << endl;
         clearScreen();
     } else {
-        cout << "=======================================\n";
-        cout << "   𝑰 𝑻 𝑬 𝑴 𝑺  𝑰 𝑵  𝑻 𝑯 𝑬  𝑪 𝑨 𝑹 𝑻  \n";
-        cout << "=======================================\n";
+        cout << "=================================================\n";
+        cout << "             ITEMS IN THE CART\n";
+        cout << "=================================================\n";
         cout << "\n";
         CartItemNode* current = cartHead;
         int index = 1;
@@ -251,9 +251,9 @@ void checkout() {
 void adminMenu() {
     int choice;
     do {
-        cout << "=======================================\n";
-        cout << "            𝑨 𝑫 𝑴  𝑰 𝑵  𝑴 𝑬 𝑵 𝑼     \n";
-        cout << "=======================================\n";
+        cout << "=================================================\n";
+        cout << "                   ADMIN MENU\n";
+        cout << "=================================================\n";
         cout << "\n";
         cout << "1. Add Item\n2. View Items\n3. Edit Item\n4. Delete Item\n5. Logout\nEnter choice: ";
         cin >> choice;
@@ -330,9 +330,9 @@ void adminMenu() {
 void userMenu() {
     int choice;
     do {
-        cout << "=======================================\n";
-        cout << "            𝑼 𝑺 𝑬 𝑹  𝑴 𝑬 𝑵 𝑼     \n";
-        cout << "=======================================\n";
+        cout << "=================================================\n";
+        cout << "                    USER MENU\n";
+        cout << "=================================================\n";
         cout << "\n";
         cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Remove from Cart\n5. Checkout\n6. Logout\nEnter choice: ";
         cin >> choice;
@@ -392,9 +392,9 @@ int main() {
 
     int startChoice;
     do {
-        cout << "=======================================\n";
-        cout << "         𝐖  𝐄 𝐋 𝐂 𝐎 𝐌 𝐄  𝐌 𝐄 𝐍 𝐔    \n";
-        cout << "=======================================\n";
+        cout << "=================================================\n";
+        cout << "                  WELCOME MENU\n";
+        cout << "=================================================\n";
         cout << "\n";
         cout << "1. Login\n2. Register\n3. Exit\nEnter choice: ";
         cin >> startChoice;
