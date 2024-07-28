@@ -74,7 +74,7 @@ void viewItems() {
         clearScreen();
     } else {
         cout << "===========================================================\n";
-        cout << "                INVENTORY MENU\n";
+        cout << "                    INVENTORY MENU\n";
         cout << "===========================================================\n";
         cout << setw(5) << left << "No."
              << setw(25) << left << "Item Name"
@@ -174,7 +174,7 @@ void viewCart() {
         clearScreen();
     } else {
         cout << "=================================================\n";
-        cout << "             ITEMS IN THE CART\n";
+        cout << "                ITEMS IN THE CART\n";
         cout << "=================================================\n";
         cout << "\n";
         CartItemNode* current = cartHead;
