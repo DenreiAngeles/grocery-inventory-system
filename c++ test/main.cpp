@@ -171,7 +171,6 @@ void addToCart(int index, int quantity) {
 void viewCart() {
     if (cartHead == nullptr) {
         cout << "Cart is empty." << endl;
-        clearScreen();
     } else {
         cout << "=======================================\n";
         cout << "   𝑰 𝑻 𝑬 𝑴 𝑺  𝑰 𝑵  𝑻 𝑯 𝑬  𝑪 𝑨 𝑹 𝑻  \n";
@@ -273,6 +272,7 @@ void adminMenu() {
             cout << "Item added to inventory.";
             clearScreen();
         } else if (choice == 2) {
+            clearScreen();
             viewItems();
             cout << "\nPress ENTER to return to the user menu.";
             cin.ignore();
@@ -283,6 +283,7 @@ void adminMenu() {
             string name;
             double price;
             int quantity;
+            clearScreen();
             viewItems();
             cout << endl;
             cout << "Enter item index to edit: ";
@@ -346,6 +347,10 @@ void userMenu() {
         } else if (choice == 3) {
             clearScreen();
             viewCart();
+            cout << "\nPress ENTER to return to the user menu.";
+            cin.ignore();
+            cin.get();
+            clearScreen();
         } else if (choice == 4) {
             clearScreen();
             viewCart();
