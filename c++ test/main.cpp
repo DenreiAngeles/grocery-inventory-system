@@ -111,7 +111,7 @@ void editItem(int index, const string& name, double price, int quantity) {
         current->quantity = quantity;
     } else {
         cout << "Invalid item index." << endl;
-        clearScreen();  // Corrected: Added missing semicolon
+        clearScreen();
     }
 }
 
@@ -138,7 +138,7 @@ void deleteItem(int index) {
             delete temp;
         } else {
             cout << "Invalid item index." << endl;
-            clearScreen();  // Corrected: Added missing semicolon
+            clearScreen(); 
         }
     }
 }
@@ -158,6 +158,10 @@ void addToCart(int index, int quantity) {
         newCartItem->next = cartHead;
         cartHead = newCartItem;
         cout << "Added " << quantity << " of " << current->name << " to the cart." << endl;
+        cout << "\nPress ENTER to return to the user menu.";
+            cin.ignore();
+            cin.get();
+            clearScreen();
     } else {
         cout << "Invalid item index or insufficient quantity." << endl;
         clearScreen();
@@ -335,7 +339,6 @@ void userMenu() {
                 int index, quantity;
                 cout << "\nEnter item index to buy: ";
                 cin >> index;
-                clearScreen();
                 cout << "Enter quantity to buy: ";
                 cin >> quantity;
                 addToCart(index - 1, quantity);
@@ -382,6 +385,7 @@ int main() {
         cout << "1. Login\n2. Register\n3. Exit\nEnter choice: ";
         cin >> startChoice;
         if (startChoice == 1) {
+            clearScreen();
             string username, password;
             bool isAdmin;
             cout << "Enter username: ";
