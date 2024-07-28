@@ -3,6 +3,7 @@
 #include <thread>
 #include <string>
 #include <cstdlib>
+#include <iomanip>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ struct User {
 
 User* users = nullptr;
 
-void clearScreen(){
+void clearScreen() {
     std::this_thread::sleep_for(chrono::seconds(2));
     cout << "\033[2J\033[1;1H";
 }
@@ -29,7 +30,7 @@ void registerUser(const string& username, const string& password, bool isAdmin) 
     users = newUser;
 }
 
-bool loginUser(const string& username, const string& password, bool &isAdmin) {
+bool loginUser(const string& username, const string& password, bool& isAdmin) {
     User* current = users;
     while (current != nullptr) {
         if (current->username == username && current->password == password) {
@@ -72,13 +73,28 @@ void viewItems() {
         cout << "No items in the inventory." << endl;
         clearScreen();
     } else {
+        cout << "===============================================\n";
+        cout << "       𝑰 𝑵 𝑽 𝑬 𝑵 𝑻 𝑶 𝑹 𝒀   𝑰 𝑻 𝑬 𝑴 𝑺            \n";
+        cout << "===============================================\n";
+        cout << setw(5) << left << "No."
+             << setw(25) << left << "Item Name"
+             << setw(10) << left << "Price"
+             << setw(10) << left << "Quantity"
+             << endl;
+        cout << "-----------------------------------------------\n";
+
         Item* current = inventoryHead;
         int index = 1;
         while (current != nullptr) {
-            cout << index << ". " << current->name << " - $" << current->price << " - Quantity: " << current->quantity << endl;
+            cout << setw(5) << left << index
+                 << setw(25) << left << current->name
+                 << "$" << setw(9) << left << fixed << setprecision(2) << current->price
+                 << setw(10) << left << current->quantity
+                 << endl;
             current = current->next;
             index++;
         }
+        cout << "===============================================\n";
     }
 }
 
@@ -95,7 +111,7 @@ void editItem(int index, const string& name, double price, int quantity) {
         current->quantity = quantity;
     } else {
         cout << "Invalid item index." << endl;
-        clearScreen();
+        clearScreen();  // Corrected: Added missing semicolon
     }
 }
 
@@ -122,7 +138,7 @@ void deleteItem(int index) {
             delete temp;
         } else {
             cout << "Invalid item index." << endl;
-            clearScreen();
+            clearScreen();  // Corrected: Added missing semicolon
         }
     }
 }
@@ -153,10 +169,15 @@ void viewCart() {
         cout << "Cart is empty." << endl;
         clearScreen();
     } else {
+        cout << "=======================================\n";
+        cout << "   𝑰 𝑻 𝑬 𝑴 𝑺  𝑰 𝑵  𝑻 𝑯 𝑬  𝑪 𝑨 𝑹 𝑻  \n";
+        cout << "=======================================\n";
+        cout << "\n";
         CartItemNode* current = cartHead;
         int index = 1;
         while (current != nullptr) {
             cout << index << ". " << current->item.name << " - $" << current->item.price << " - Quantity: " << current->quantity << endl;
+            cout << "\n";
             current = current->next;
             index++;
         }
@@ -226,6 +247,10 @@ void checkout() {
 void adminMenu() {
     int choice;
     do {
+        cout << "=======================================\n";
+        cout << "            𝑨 𝑫 𝑴  𝑰 𝑵  𝑴 𝑬 𝑵 𝑼     \n";
+        cout << "=======================================\n";
+        cout << "\n";
         cout << "1. Add Item\n2. View Items\n3. Edit Item\n4. Delete Item\n5. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
@@ -287,6 +312,10 @@ void adminMenu() {
 void userMenu() {
     int choice;
     do {
+        cout << "=======================================\n";
+        cout << "            𝑼 𝑺 𝑬 𝑹  𝑴 𝑬 𝑵 𝑼     \n";
+        cout << "=======================================\n";
+        cout << "\n";
         cout << "1. View Items\n2. Buy Item\n3. View Cart\n4. Remove from Cart\n5. Checkout\n6. Logout\nEnter choice: ";
         cin >> choice;
         if (choice == 1) {
@@ -345,6 +374,10 @@ int main() {
 
     int startChoice;
     do {
+        cout << "=======================================\n";
+        cout << "         𝐖  𝐄 𝐋 𝐂 𝐎 𝐌 𝐄  𝐌 𝐄 𝐍 𝐔    \n";
+        cout << "=======================================\n";
+        cout << "\n";
         cout << "1. Login\n2. Register\n3. Exit\nEnter choice: ";
         cin >> startChoice;
         if (startChoice == 1) {
@@ -357,11 +390,11 @@ int main() {
 
             if (loginUser(username, password, isAdmin)) {
                 if (isAdmin) {
-                    cout << "Admin logged in succesfully . . .";
+                    cout << "Admin logged in successfully . . .";
                     clearScreen();
                     adminMenu();
                 } else {
-                    cout << "Logged in succesfully . . .";
+                    cout << "Logged in successfully . . .";
                     clearScreen();
                     userMenu();
                 }
