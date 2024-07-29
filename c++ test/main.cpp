@@ -7,11 +7,27 @@
 
 using namespace std;
 
+struct Item {
+    string name;
+    double price;
+    int quantity;
+    Item* next;
+};
+
+Item* inventoryHead = nullptr;
+
+struct CartItemNode {
+    Item item;
+    int quantity;
+    CartItemNode* next;
+};
+
 struct User {
     string username;
     string password;
     bool isAdmin;
     User* next;
+    CartItemNode* cartHead;
 };
 
 User* users = nullptr;
@@ -38,9 +54,9 @@ void registerUser(const string& username, const string& password, bool isAdmin) 
     newUser->password = password;
     newUser->isAdmin = isAdmin;
     newUser->next = users;
+    newUser->cartHead = nullptr;
     users = newUser;
 }
-
 
 bool loginUser(const string& username, const string& password, bool& isAdmin) {
     User* current = users;
@@ -53,23 +69,6 @@ bool loginUser(const string& username, const string& password, bool& isAdmin) {
     }
     return false;
 }
-
-struct Item {
-    string name;
-    double price;
-    int quantity;
-    Item* next;
-};
-
-Item* inventoryHead = nullptr;
-
-struct CartItemNode {
-    Item item;
-    int quantity;
-    CartItemNode* next;
-};
-
-CartItemNode* cartHead = nullptr;
 
 void addItem(const string& name, double price, int quantity) {
     Item* newItem = new Item();
@@ -155,7 +154,7 @@ void deleteItem(int index) {
     }
 }
 
-void addToCart(int index, int quantity) {
+void addToCart(User* user, int index, int quantity) {
     Item* current = inventoryHead;
     int currentIndex = 0;
     while (current != nullptr && currentIndex < index) {
@@ -167,21 +166,21 @@ void addToCart(int index, int quantity) {
         CartItemNode* newCartItem = new CartItemNode();
         newCartItem->item = *current;
         newCartItem->quantity = quantity;
-        newCartItem->next = cartHead;
-        cartHead = newCartItem;
+        newCartItem->next = user->cartHead;
+        user->cartHead = newCartItem;
         cout << "Added " << quantity << " of " << current->name << " to the cart." << endl;
         cout << "\nPress ENTER to return to the user menu.";
-            cin.ignore();
-            cin.get();
-            clearScreen();
+        cin.ignore();
+        cin.get();
+        clearScreen();
     } else {
         cout << "Invalid item index or insufficient quantity." << endl;
         clearScreen();
     }
 }
 
-void viewCart() {
-    if (cartHead == nullptr) {
+void viewCart(User* user) {
+    if (user->cartHead == nullptr) {
         cout << "Cart is empty." << endl;
         clearScreen();
     } else {
@@ -189,7 +188,7 @@ void viewCart() {
         cout << "                ITEMS IN THE CART\n";
         cout << "=================================================\n";
         cout << "\n";
-        CartItemNode* current = cartHead;
+        CartItemNode* current = user->cartHead;
         int index = 1;
         while (current != nullptr) {
             cout << index << ". " << current->item.name << " - $" << current->item.price << " - Quantity: " << current->quantity << endl;
@@ -200,19 +199,19 @@ void viewCart() {
     }
 }
 
-void removeFromCart(int index) {
-    if (cartHead == nullptr) {
+void removeFromCart(User* user, int index) {
+    if (user->cartHead == nullptr) {
         cout << "Cart is empty. Nothing to remove." << endl;
         clearScreen();
         return;
     }
 
     if (index == 0) {
-        CartItemNode* temp = cartHead;
-        cartHead = cartHead->next;
+        CartItemNode* temp = user->cartHead;
+        user->cartHead = user->cartHead->next;
         delete temp;
     } else {
-        CartItemNode* current = cartHead;
+        CartItemNode* current = user->cartHead;
         int currentIndex = 0;
         while (current->next != nullptr && currentIndex < index - 1) {
             current = current->next;
@@ -230,13 +229,13 @@ void removeFromCart(int index) {
     }
 }
 
-void checkout() {
-    if (cartHead == nullptr) {
+void checkout(User* user) {
+    if (user->cartHead == nullptr) {
         cout << "Cart is empty. Nothing to checkout." << endl;
         clearScreen();
     } else {
         double total = 0;
-        CartItemNode* current = cartHead;
+        CartItemNode* current = user->cartHead;
         while (current != nullptr) {
             total += current->item.price * current->quantity;
             current = current->next;
@@ -246,9 +245,9 @@ void checkout() {
         char confirmation;
         cin >> confirmation;
         if (confirmation == 'y' || confirmation == 'Y') {
-            while (cartHead != nullptr) {
-                CartItemNode* temp = cartHead;
-                cartHead = cartHead->next;
+            while (user->cartHead != nullptr) {
+                CartItemNode* temp = user->cartHead;
+                user->cartHead = user->cartHead->next;
                 delete temp;
             }
             cout << "Checked out successfully. Thank you for your purchase!" << endl;
@@ -340,7 +339,7 @@ void adminMenu() {
     clearScreen();
 }
 
-void userMenu() {
+void userMenu(User* user) {
     int choice;
     do {
         cout << "=================================================\n";
@@ -368,11 +367,11 @@ void userMenu() {
                 cin >> index;
                 cout << "Enter quantity to buy: ";
                 cin >> quantity;
-                addToCart(index - 1, quantity);
+                addToCart(user, index - 1, quantity);
             }
         } else if (choice == 3) {
             clearScreen();
-            viewCart();
+            viewCart(user);
             cout << "\nPress ENTER to return to the user menu.";
             cin.ignore();
             cin.get();
@@ -380,16 +379,16 @@ void userMenu() {
 
         } else if (choice == 4) {
             clearScreen();
-            viewCart();
+            viewCart(user);
             int index;
             cout << "Enter item index to remove from cart: ";
             cin >> index;
-            removeFromCart(index - 1);
+            removeFromCart(user, index - 1);
             clearScreen();
         } else if (choice == 5) {
             clearScreen();
-            viewCart();
-            checkout();
+            viewCart(user);
+            checkout(user);
         }
     } while (choice != 6);
     cout << "Logging out . . .";
@@ -426,7 +425,17 @@ int main() {
             cout << "Enter password: ";
             cin >> password;
 
+            User* loggedInUser = nullptr;
             if (loginUser(username, password, isAdmin)) {
+                User* currentUser = users;
+                while (currentUser != nullptr) {
+                    if (currentUser->username == username && currentUser->password == password) {
+                        loggedInUser = currentUser;
+                        break;
+                    }
+                    currentUser = currentUser->next;
+                }
+
                 if (isAdmin) {
                     cout << "Admin logged in successfully . . .";
                     clearScreen();
@@ -434,7 +443,7 @@ int main() {
                 } else {
                     cout << "Logged in successfully . . .";
                     clearScreen();
-                    userMenu();
+                    userMenu(loggedInUser);
                 }
             } else {
                 cout << "Invalid login credentials." << endl;
@@ -476,12 +485,6 @@ int main() {
     while (inventoryHead != nullptr) {
         Item* temp = inventoryHead;
         inventoryHead = inventoryHead->next;
-        delete temp;
-    }
-
-    while (cartHead != nullptr) {
-        CartItemNode* temp = cartHead;
-        cartHead = cartHead->next;
         delete temp;
     }
 
